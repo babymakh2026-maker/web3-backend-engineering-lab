@@ -1,0 +1,29 @@
+{
+  "network": "Sepolia",
+  "chainId": 11155111,
+  "contractName": "MessageRegistry",
+  "contractAddress": "0xd1e96b9dbd6168aa1d0baeb50ee65fecf788b9d5",
+  "ownerAddress": "0x34DaCF00D8920c97EcC813b5d90E054D466575c4",
+  "deploymentTransactionHash": "0x8e2525d964f754c81ae02e35b572ec562f2eb051fdc2fe2c7ca1f766864deb99",
+  "deploymentBlock": "11296961",
+  "deployedAt": "2026-07-18T06:13:36.000Z",
+  "initialMessage": "Web3 backend portfolio deployment",
+  "verificationWrite": {
+    "transactionHash": "0x1727fc2d2f26d52d63bfcdc404d10b58d655f3044f5d736cd57415925c566e1f",
+    "block": "11296991",
+    "message": "Portfolio API write verified on Sepolia",
+    "explorer": "https://sepolia.etherscan.io/tx/0x1727fc2d2f26d52d63bfcdc404d10b58d655f3044f5d736cd57415925c566e1f"
+  },
+  "compiler": {
+    "version": "0.8.30+commit.73712a01.Emscripten.clang",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "metadataBytecodeHash": "none"
+  },
+  "explorer": {
+    "contract": "https://sepolia.etherscan.io/address/0xd1e96b9dbd6168aa1d0baeb50ee65fecf788b9d5",
+    "transaction": "https://sepolia.etherscan.io/tx/0x8e2525d964f754c81ae02e35b572ec562f2eb051fdc2fe2c7ca1f766864deb99"
+  }
+}

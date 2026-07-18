@@ -39,10 +39,10 @@ async function startApi(service: WethSnapshotService) {
 describe('fixed-block WETH snapshot', () => {
   test('serializes the four contract values deterministically', async () => {
     const calls: string[] = [];
-    const values: Record<string, string | bigint> = {
+    const values: Record<string, string | bigint | number> = {
       name: 'Wrapped Ether',
       symbol: 'WETH',
-      decimals: 18n,
+      decimals: 18,
       totalSupply: 123_456_789n
     };
     const service = createWethSnapshotService({
@@ -70,7 +70,7 @@ describe('fixed-block WETH snapshot', () => {
         ({
           name: 'Wrapped Ether',
           symbol: 'WETH',
-          decimals: 18n,
+          decimals: 18,
           totalSupply: 123n
         })[functionName]
     });

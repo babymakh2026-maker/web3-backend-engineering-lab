@@ -64,6 +64,12 @@ function assertBigInt(value: unknown, field: string): asserts value is bigint {
   }
 }
 
+function assertUint8(value: unknown, field: string): asserts value is number {
+  if (!Number.isInteger(value) || Number(value) < 0 || Number(value) > 255) {
+    throw new TypeError(`Contract returned an invalid ${field}`);
+  }
+}
+
 export function createWethSnapshotService(options: {
   rpcUrl?: string;
   readFunction?: ReadFunction;
@@ -75,6 +81,7 @@ export function createWethSnapshotService(options: {
       timeout: 10_000
     })
   });
+
   const readFunction: ReadFunction =
     options.readFunction ??
     ((functionName) =>
@@ -87,16 +94,15 @@ export function createWethSnapshotService(options: {
 
   return {
     async getSnapshot(): Promise<WethSnapshot> {
-      const [name, symbol, decimals, totalSupply] = await Promise.all([
-        readFunction('name'),
-        readFunction('symbol'),
-        readFunction('decimals'),
-        readFunction('totalSupply')
-      ]);
+      // Sequential historical reads stay within conservative public RPC limits.
+      const name = await readFunction('name');
+      const symbol = await readFunction('symbol');
+      const decimals = await readFunction('decimals');
+      const totalSupply = await readFunction('totalSupply');
 
       assertString(name, 'name');
       assertString(symbol, 'symbol');
-      assertBigInt(decimals, 'decimals');
+      assertUint8(decimals, 'decimals');
       assertBigInt(totalSupply, 'totalSupply');
 
       return {
@@ -109,7 +115,7 @@ export function createWethSnapshotService(options: {
         values: {
           name,
           symbol,
-          decimals: Number(decimals),
+          decimals,
           totalSupplyWei: totalSupply.toString()
         }
       };

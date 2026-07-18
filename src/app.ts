@@ -1,12 +1,25 @@
 import express, { type ErrorRequestHandler } from 'express';
 
+import { createMessageRegistryRouter } from './routes/messageRegistry.js';
+import { createNotesRouter } from './routes/notes.js';
 import { createWethSnapshotRouter } from './routes/wethSnapshot.js';
+import {
+  createMessageRegistryService,
+  type MessageRegistryService
+} from './services/messageRegistry.js';
 import {
   createWethSnapshotService,
   type WethSnapshotService
 } from './services/wethSnapshot.js';
+import {
+  createNotesStore,
+  type NotesStore
+} from './stores/notesStore.js';
 
 export interface AppOptions {
+  messageRegistryService?: MessageRegistryService;
+  notesStore?: NotesStore;
+  portfolioWriteToken?: string;
   wethSnapshotService?: WethSnapshotService;
 }
 
@@ -18,6 +31,18 @@ export function createApp(options: AppOptions = {}) {
     createWethSnapshotService(
       ethereumRpcUrl === undefined ? {} : { rpcUrl: ethereumRpcUrl }
     );
+  const messageRegistryService =
+    options.messageRegistryService ??
+    createMessageRegistryService({
+      ...(process.env.SEPOLIA_RPC_URL === undefined
+        ? {}
+        : { rpcUrl: process.env.SEPOLIA_RPC_URL }),
+      ...(process.env.PORTFOLIO_SIGNER_PRIVATE_KEY === undefined
+        ? {}
+        : { privateKey: process.env.PORTFOLIO_SIGNER_PRIVATE_KEY })
+    });
+  const portfolioWriteToken =
+    options.portfolioWriteToken ?? process.env.PORTFOLIO_WRITE_TOKEN;
 
   app.disable('x-powered-by');
   app.use(express.json({ limit: '16kb' }));
@@ -30,6 +55,16 @@ export function createApp(options: AppOptions = {}) {
     '/api/v1/ethereum/weth-snapshot',
     createWethSnapshotRouter(wethSnapshotService)
   );
+  app.use(
+    '/api/v1/contracts/message-registry',
+    createMessageRegistryRouter({
+      service: messageRegistryService,
+      ...(portfolioWriteToken === undefined
+        ? {}
+        : { writeToken: portfolioWriteToken })
+    })
+  );
+  app.use('/api/v1/notes', createNotesRouter(options.notesStore ?? createNotesStore()));
 
   app.use((_request, response) => {
     response.status(404).json({
