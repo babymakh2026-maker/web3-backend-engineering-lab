@@ -8,6 +8,8 @@ updates:
       time: '05:00'
     open-pull-requests-limit: 5
     ignore:
+      # Compiler pin is part of the published Sepolia bytecode evidence.
+      - dependency-name: solc
       - dependency-name: typescript
         update-types:
           - version-update:semver-major
