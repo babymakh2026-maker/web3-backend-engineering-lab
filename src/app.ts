@@ -1,7 +1,23 @@
 import express, { type ErrorRequestHandler } from 'express';
 
-export function createApp() {
+import { createWethSnapshotRouter } from './routes/wethSnapshot.js';
+import {
+  createWethSnapshotService,
+  type WethSnapshotService
+} from './services/wethSnapshot.js';
+
+export interface AppOptions {
+  wethSnapshotService?: WethSnapshotService;
+}
+
+export function createApp(options: AppOptions = {}) {
   const app = express();
+  const ethereumRpcUrl = process.env.ETHEREUM_RPC_URL;
+  const wethSnapshotService =
+    options.wethSnapshotService ??
+    createWethSnapshotService(
+      ethereumRpcUrl === undefined ? {} : { rpcUrl: ethereumRpcUrl }
+    );
 
   app.disable('x-powered-by');
   app.use(express.json({ limit: '16kb' }));
@@ -9,6 +25,11 @@ export function createApp() {
   app.get('/health', (_request, response) => {
     response.status(200).json({ status: 'ok' });
   });
+
+  app.use(
+    '/api/v1/ethereum/weth-snapshot',
+    createWethSnapshotRouter(wethSnapshotService)
+  );
 
   app.use((_request, response) => {
     response.status(404).json({
